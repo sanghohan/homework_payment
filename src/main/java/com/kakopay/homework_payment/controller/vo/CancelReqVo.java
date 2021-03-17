@@ -5,6 +5,6 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class PaymentReqVo {
+public class CancelReqVo {
     private String cardNum;
 }
