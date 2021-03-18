@@ -1,4 +1,4 @@
-package com.kakopay.homework_payment;
+package com.kakopay.homework.payment;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package com.kakopay.homework_payment.controller.vo;
+package com.kakopay.homework.payment.controller.vo;
 
 import lombok.Builder;
 import lombok.Getter;

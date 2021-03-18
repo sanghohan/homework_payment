@@ -1,11 +1,9 @@
-package com.kakopay.homework_payment.controller;
+package com.kakopay.homework.payment.controller;
 
 
-import com.kakopay.homework_payment.controller.vo.CancelReqVo;
-import com.kakopay.homework_payment.controller.vo.PayReqVo;
+import com.kakopay.homework.payment.controller.vo.CancelReqVo;
+import com.kakopay.homework.payment.controller.vo.PayReqVo;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

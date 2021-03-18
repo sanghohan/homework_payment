@@ -1,4 +1,4 @@
-package com.kakopay.homework_payment.controller.vo;
+package com.kakopay.homework.payment.controller.vo;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -7,6 +7,6 @@ import lombok.ToString;
 @Builder
 @Getter
 @ToString
-public class PayResVo {
+public class PayInfoResVo {
     private String cardNum;
 }
