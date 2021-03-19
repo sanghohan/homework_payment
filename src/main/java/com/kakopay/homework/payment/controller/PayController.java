@@ -3,8 +3,10 @@ package com.kakopay.homework.payment.controller;
 
 import com.kakopay.homework.payment.controller.vo.CancelReqVo;
 import com.kakopay.homework.payment.controller.vo.PayReqVo;
+import com.kakopay.homework.payment.controller.vo.PayResVo;
 import com.kakopay.homework.payment.dto.PayReqDto;
 import com.kakopay.homework.payment.service.PaymentService;
+import com.kakopay.homework.payment.util.PayDataUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -21,11 +23,18 @@ public class PayController {
     private PaymentService paymentService;
 
     @PostMapping(value = "/pay", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public String pay(@Validated @RequestBody PayReqVo request) {
+    public PayResVo pay(@Validated @RequestBody PayReqVo request) {
 
         log.debug("request object : " + request);
+        PayReqDto reqDto = PayReqDto.builder()
+                .payId(PayDataUtil.getPayId())
+                .payAmount(request.getPayAmount())
+                .payVat(request.getVat())
+                .installmentMonths(request.getInstallmentMonths())
+                .cardData(PayDataUtil.getCardData(request.getCardNum(), request.getValidPeriod(), request.getCvc()))
+                .build();
 
-        return "success";
+        return paymentService.pay(reqDto);
     }
 
     @PostMapping(value = "/cancel", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)

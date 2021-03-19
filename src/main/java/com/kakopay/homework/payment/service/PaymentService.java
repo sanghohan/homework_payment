@@ -1,8 +1,8 @@
 package com.kakopay.homework.payment.service;
 
+import com.kakopay.homework.payment.controller.vo.PayResVo;
 import com.kakopay.homework.payment.dto.CancelDto;
 import com.kakopay.homework.payment.dto.PayReqDto;
-import com.kakopay.homework.payment.dto.PayResDto;
 import com.kakopay.homework.payment.entity.Payment;
 import com.kakopay.homework.payment.repository.PaymentRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -19,22 +19,23 @@ public class PaymentService {
     private PaymentRepository paymentRepository;
 
     @Transactional
-    public PayResDto pay(PayReqDto reqDto) {
+    public PayResVo pay(PayReqDto reqDto) {
 
        Payment payment = Payment.payBuilder()
-               .payId("testId")
+               .payId("test")
                .payAmount(100)
                .installmentMonths(0)
                .cardData("test11")
                .payBuild();
 
+        paymentRepository.save(payment);
 
-        return new PayResDto();
+        return null;
+
     }
 
     @Transactional
     public CancelDto cancel(CancelDto reqDto) {
-
 
         Payment payment = Payment.cancelBuilder()
                 .cancelAmount(100)

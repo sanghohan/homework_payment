@@ -35,6 +35,6 @@ public class PayReqVo {
 
     @Min(0)
     @Max(1000000000)
-    private Integer vat;
+    private Long vat;
 
 }
