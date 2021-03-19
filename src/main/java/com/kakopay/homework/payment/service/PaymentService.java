@@ -21,8 +21,6 @@ public class PaymentService {
     @Transactional
     public PayResDto pay(PayReqDto reqDto) {
 
-
-
        Payment payment = Payment.payBuilder()
                .payId("testId")
                .payAmount(100)

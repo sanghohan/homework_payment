@@ -4,10 +4,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.hibernate.validator.constraints.CreditCardNumber;
 
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 
 @Getter
 @ToString
@@ -30,6 +27,14 @@ public class PayReqVo {
     @Pattern(regexp = "^(0|1)([1-12])$", message = "Check format. MM")
     private String installmentMonths;
 
+    @NotNull
+    @NotEmpty
+    @Min(100)
+    @Max(1000000000)
+    private Long payAmount;
+
+    @Min(0)
+    @Max(1000000000)
     private Integer vat;
 
 }
