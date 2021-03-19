@@ -1,9 +1,13 @@
 package com.kakopay.homework.payment.dto;
 
-public class PayDto {
+import lombok.Builder;
+import lombok.Getter;
+
+@Builder
+@Getter
+public class PayReqDto {
 
     private String payId;
     private String cardData;
-
 
 }

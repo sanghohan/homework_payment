@@ -7,11 +7,11 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "PAYMENT_DATA")
+@Table(name = "PAYMENT")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode
-public class PaymentData {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = { "id", "payId" } )
+public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,28 +53,44 @@ public class PaymentData {
     @Column(nullable = false)
     private LocalDateTime updDt;
 
-    @Builder(builderClassName = "ByPayBuilder", buildMethodName = "ByPayBuilder")
-    public PaymentData(Integer payAmount, Integer installmentMonths, String cardData) {
+    public enum PayStatus {
+        PAYID,
+        CANCELD,
+        PARTIALLY_CANCELLED
+    }
 
-        //Assert.state(payAmount == 0, "payAmount must not be bigger than 0");
-        //Assert.hasText(cardData, "cardData must not be empty");
+    public enum PayType {
+        PAY,
+        CANCEL
+    }
 
+
+    @Builder(builderClassName = "PayBuilder", builderMethodName = "payBuilder", buildMethodName = "payBuild")
+    public Payment(String payId, Integer payAmount, Integer installmentMonths, String cardData) {
+
+
+        Assert.hasLength(payId, "payId must not be empty");
+        Assert.state(payAmount == 0, "payAmount must not be bigger than 0");
+        Assert.hasLength(cardData, "cardData must not be empty");
+
+        this.payId = payId;
         this.payAmount = payAmount;
         this.cancelAmount = 0;
         this.installmentMonths = installmentMonths;
         this.payVat = Math.round(payAmount/11);
         this.payType = PayType.PAY;
+        this.status = PayStatus.PAYID;
         this.cardData = cardData;
         this.regDt = LocalDateTime.now();
         this.updDt = LocalDateTime.now();
     }
 
-    /*@Builder(builderClassName = "ByCancelBuilder", buildMethodName = "ByCancelBuilder")
-    public PaymentData(String payId, Integer cancelAmount, String cardData) {
+    @Builder(builderClassName = "CancelBuilder", builderMethodName = "cancelBuilder", buildMethodName = "cancelBuild")
+    public Payment(String payId, Integer cancelAmount, String cardData) {
 
-        Assert.hasText(payId, "payId must not be empty");
+        Assert.hasLength(payId, "payId must not be empty");
         Assert.state(cancelAmount == 0, "cancelAmount must not be bigger than 0");
-        Assert.hasText(cardData, "cardData must not be empty");
+        Assert.hasLength(cardData, "cardData must not be empty");
 
         this.payId = payId;
         this.cancelAmount = cancelAmount;
@@ -83,8 +99,9 @@ public class PaymentData {
         this.cancelVat = Math.round(cancelAmount/11);
         this.payType = PayType.CANCEL;
         this.cardData = cardData;
+        this.regDt = LocalDateTime.now();
         this.updDt = LocalDateTime.now();
-    }*/
+    }
 
 
 }
