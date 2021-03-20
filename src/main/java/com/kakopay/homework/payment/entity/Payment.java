@@ -33,16 +33,16 @@ public class Payment {
     @Column(nullable = false)
     private Integer installmentMonths;
 
-    @Column(nullable = true)
+    @Column
     private Long payVat;
 
-    @Column(nullable = true)
+    @Column
     private Long cancelVat;
 
     @Column(nullable = false)
     private String cardData;
 
-    @Column(nullable = true, length = 450)
+    @Column(length = 450)
     private String LinkedData;
 
     @Enumerated(EnumType.STRING)
