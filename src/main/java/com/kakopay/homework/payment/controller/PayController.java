@@ -23,9 +23,10 @@ public class PayController {
     private PaymentService paymentService;
 
     @PostMapping(value = "/pay", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public PayResVo pay(@Validated @RequestBody PayReqVo request) {
+    public PayResVo pay(@Validated @RequestBody PayReqVo request) throws Exception {
 
         log.debug("request object : " + request);
+
         PayReqDto reqDto = PayReqDto.builder()
                 .payId(PayDataUtil.getPayId())
                 .payAmount(request.getPayAmount())
@@ -33,6 +34,8 @@ public class PayController {
                 .installmentMonths(request.getInstallmentMonths())
                 .cardData(PayDataUtil.getCardData(request.getCardNum(), request.getValidPeriod(), request.getCvc()))
                 .build();
+
+        log.debug("reqDto object : " + reqDto);
 
         return paymentService.pay(reqDto);
     }

@@ -12,7 +12,7 @@ public class PayReqVo {
 
     @NotNull
     @NotBlank
-    @CreditCardNumber(message = "card number is wrong")
+    //@CreditCardNumber(message = "card number is wrong")
     private String cardNum;
 
     @NotNull
@@ -23,12 +23,11 @@ public class PayReqVo {
     @Digits(integer = 3, fraction = 0, message = "Wrong CVV")
     private String cvc;
 
-    @NotNull
-    @Pattern(regexp = "^(0|1)([1-12])$", message = "Check format. MM")
-    private String installmentMonths;
 
-    @NotNull
-    @NotEmpty
+    @Min(0)
+    @Max(12)
+    private Integer installmentMonths;
+
     @Min(100)
     @Max(1000000000)
     private Long payAmount;

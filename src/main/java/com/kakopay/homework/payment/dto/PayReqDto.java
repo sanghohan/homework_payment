@@ -6,12 +6,13 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@ToString
 public class PayReqDto {
 
     private String payId;
     private Long payAmount;
     private Long payVat;
-    private String installmentMonths;
+    private Integer installmentMonths;
     private String cardData;
 
 }

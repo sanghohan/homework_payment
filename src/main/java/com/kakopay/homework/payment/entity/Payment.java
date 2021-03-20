@@ -1,6 +1,7 @@
 package com.kakopay.homework.payment.entity;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
@@ -24,24 +25,24 @@ public class Payment {
     private PayType payType;
 
     @Column(nullable = false)
-    private Integer payAmount;
+    private Long payAmount;
 
     @Column(nullable = true)
-    private Integer cancelAmount;
+    private Long cancelAmount;
 
     @Column(nullable = false)
     private Integer installmentMonths;
 
     @Column(nullable = true)
-    private Integer payVat;
+    private Long payVat;
 
     @Column(nullable = true)
-    private Integer cancelVat;
+    private Long cancelVat;
 
     @Column(nullable = false)
     private String cardData;
 
-    @Column(nullable = false, length = 450)
+    @Column(nullable = true, length = 450)
     private String LinkedData;
 
     @Enumerated(EnumType.STRING)
@@ -54,7 +55,7 @@ public class Payment {
     private LocalDateTime updDt;
 
     public enum PayStatus {
-        PAYID,
+        PAID,
         CANCELD,
         PARTIALLY_CANCELLED
     }
@@ -66,27 +67,26 @@ public class Payment {
 
 
     @Builder(builderClassName = "PayBuilder", builderMethodName = "payBuilder", buildMethodName = "payBuild")
-    public Payment(String payId, Integer payAmount, Integer installmentMonths, String cardData) {
-
+    public Payment(String payId, Long payAmount, Long payVat, Integer installmentMonths, String cardData) {
 
         Assert.hasLength(payId, "payId must not be empty");
-        Assert.state(payAmount == 0, "payAmount must not be bigger than 0");
+        Assert.state(payAmount > 100, "payAmount must not be bigger than 100");
         Assert.hasLength(cardData, "cardData must not be empty");
 
         this.payId = payId;
         this.payAmount = payAmount;
-        this.cancelAmount = 0;
+        this.cancelAmount = 0L;
         this.installmentMonths = installmentMonths;
-        this.payVat = Math.round(payAmount/11);
+        this.payVat =  payVat > 0 ? payVat : Long.valueOf(Math.round(payAmount/11));
         this.payType = PayType.PAY;
-        this.status = PayStatus.PAYID;
+        this.status = PayStatus.PAID;
         this.cardData = cardData;
         this.regDt = LocalDateTime.now();
         this.updDt = LocalDateTime.now();
     }
 
     @Builder(builderClassName = "CancelBuilder", builderMethodName = "cancelBuilder", buildMethodName = "cancelBuild")
-    public Payment(String payId, Integer cancelAmount, String cardData) {
+    public Payment(String payId, Long cancelAmount, Long cancelVat, String cardData) {
 
         Assert.hasLength(payId, "payId must not be empty");
         Assert.state(cancelAmount == 0, "cancelAmount must not be bigger than 0");
@@ -94,9 +94,9 @@ public class Payment {
 
         this.payId = payId;
         this.cancelAmount = cancelAmount;
-        this.payAmount = 0;
+        this.payAmount = 0l;
         this.installmentMonths = 0;
-        this.cancelVat = Math.round(cancelAmount/11);
+        this.cancelVat = cancelVat > 0 ? cancelVat : Long.valueOf(Math.round(cancelAmount/11));
         this.payType = PayType.CANCEL;
         this.cardData = cardData;
         this.regDt = LocalDateTime.now();
