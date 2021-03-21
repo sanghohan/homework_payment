@@ -3,6 +3,7 @@ package com.kakopay.homework.payment.util;
 import java.util.Arrays;
 
 
+@Deprecated
 public class StringFormatUtils {
 
     public static String padByStringLength(String source, char fill, int stringLength, boolean right) {

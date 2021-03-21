@@ -10,7 +10,7 @@ import java.util.StringJoiner;
 @Slf4j
 public class PayDataUtil {
 
-    public static String getPayId() {
+    public static String generatePayId() {
 
         return System.currentTimeMillis() + RandomString.make(7);
 
@@ -55,4 +55,7 @@ public class PayDataUtil {
 
     }
 
+    public static Integer getVat(Integer value) {
+        return value != null ? value : Math.round(value/11);
+    }
 }

@@ -1,19 +1,72 @@
 package com.kakopay.homework.payment.external.linkdata.stringdata;
 
+import com.kakopay.homework.payment.util.PayDataUtil;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
+@FixedLengthType(length = 416)
+@Builder
+@Slf4j
 public class Body {
 
-    @FixedLengthField(align = FixedLengthField.Alignment.RIGHT, maxSize = 20)
+    @FixedLengthField(fieldSet = FieldSet.NUMBER_L, length = 20)
     private String cardNum;
+
+    @FixedLengthField(fieldSet = FieldSet.NUMBER_0, length = 2)
+    private int installmentMonths;
+
+    @FixedLengthField(fieldSet = FieldSet.NUMBER_L, length = 4)
     private String validPeriod;
+
+    @FixedLengthField(fieldSet = FieldSet.NUMBER_L, length = 3)
     private String cvc;
-    private Integer transactionAmount;
-    private Integer vat;
+
+    @FixedLengthField(fieldSet = FieldSet.NUMBER, length = 10)
+    private int transactionAmount;
+
+    @FixedLengthField(fieldSet = FieldSet.NUMBER_0, length = 10)
+    private int vat;
+
+    @FixedLengthField(fieldSet = FieldSet.STRING, length = 20)
     private String orgPayId;
 
+    @FixedLengthField(fieldSet = FieldSet.STRING, length = 300)
     private String encryptedCardData;
-    private String reserved;
+
+    @FixedLengthField(fieldSet = FieldSet.RESERVED, length = 47)
+    @Builder.Default
+    private String reserved=" ";
+
+    public String getStringData() {
+        return StringDataGenerator.getStringData(this);
+    }
+
+    public static BodyBuilder builder() {
+        return new encryptedCardDataBuilder();
+    }
+
+    private static class encryptedCardDataBuilder extends BodyBuilder {
+
+        @Override
+        public Body build() {
+
+            try {
+                String encryptedCardData = PayDataUtil.getEncCardData(super.cardNum, super.validPeriod, super.cvc);
+                super.encryptedCardData(encryptedCardData);
+
+                if(super.vat == 0 )
+                    super.vat(PayDataUtil.getVat(super.transactionAmount));
+
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                return super.build();
+            }
+
+            return super.build();
+        }
+    }
+
 
 }

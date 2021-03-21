@@ -78,7 +78,7 @@ public class Payment {
         this.payAmount = payAmount;
         this.cancelAmount = 0;
         this.installmentMonths = installmentMonths;
-        this.payVat =  getVat(payAmount);
+        this.payVat =  PayDataUtil.getVat(payAmount);
         this.payType = PayType.PAY;
         this.status = PayStatus.PAID;
         this.cardData = cardData;
@@ -97,7 +97,7 @@ public class Payment {
         this.cancelAmount = cancelAmount;
         this.payAmount = 0;
         this.installmentMonths = 0;
-        this.cancelVat = getVat(cancelAmount);
+        this.cancelVat = PayDataUtil.getVat(cancelAmount);
         this.payType = PayType.CANCEL;
         this.cardData = cardData;
         this.regDt = LocalDateTime.now();
@@ -117,8 +117,5 @@ public class Payment {
         return payment;
     }
 
-    private Integer getVat(Integer value) {
-        return value != null ? value : Math.round(value/11);
-    }
 
 }

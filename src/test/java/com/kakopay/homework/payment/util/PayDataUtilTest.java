@@ -21,7 +21,7 @@ class PayDataUtilTest {
         List<String> checkList = new ArrayList<>();
 
         for (int i = 0; i < 1000; i++) {
-            String payId = PayDataUtil.getPayId();
+            String payId = PayDataUtil.generatePayId();
             assertThat(payId.length()).isEqualTo(20);
 
             if(i>0 && checkList.contains(payId))

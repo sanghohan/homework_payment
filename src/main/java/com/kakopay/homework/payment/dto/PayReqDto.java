@@ -18,7 +18,7 @@ public class PayReqDto {
     public static PayReqDto get(PayReqVo payReqVo) {
 
         PayReqDto reqDto = PayReqDto.builder()
-                .payId(PayDataUtil.getPayId())
+                .payId(PayDataUtil.generatePayId())
                 .payAmount(payReqVo.getPayAmount())
                 .payVat(payReqVo.getVat())
                 .installmentMonths(payReqVo.getInstallmentMonths())
