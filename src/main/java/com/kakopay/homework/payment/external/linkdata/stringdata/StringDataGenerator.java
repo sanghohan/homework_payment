@@ -3,6 +3,7 @@ package com.kakopay.homework.payment.external.linkdata.stringdata;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Assert;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
@@ -52,7 +53,8 @@ public class StringDataGenerator {
         log.debug("sumFieldStringLength : {}", sumFieldStringLength);
 
         if (ObjectUtils.isNotEmpty(fixedLengthType) && fixedLengthType.length() > 0) {
-            assert (fixedLengthType.length() == sumFieldStringLength);
+            Assert.state(fixedLengthType.length() == sumFieldStringLength,
+                    "sum field`s length must equal fixedLengthType.length()");
         }
     }
 

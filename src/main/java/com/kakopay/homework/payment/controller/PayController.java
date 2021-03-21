@@ -3,8 +3,8 @@ package com.kakopay.homework.payment.controller;
 
 import com.kakopay.homework.payment.controller.vo.CancelReqVo;
 import com.kakopay.homework.payment.controller.vo.PayReqVo;
-import com.kakopay.homework.payment.controller.vo.PayResVo;
 import com.kakopay.homework.payment.dto.PayReqDto;
+import com.kakopay.homework.payment.external.linkdata.stringdata.StringData;
 import com.kakopay.homework.payment.service.PaymentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class PayController {
     private PaymentService paymentService;
 
     @PostMapping(value = "/pay", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public PayResVo pay(@Validated @RequestBody PayReqVo request) throws Exception {
+    public StringData pay(@Validated @RequestBody PayReqVo request) throws Exception {
 
         log.debug("request object : " + request);
 

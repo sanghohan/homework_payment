@@ -1,6 +1,7 @@
 package com.kakopay.homework.payment.external.linkdata.stringdata;
 
 
+import com.kakopay.homework.payment.dto.PayReqDto;
 import com.kakopay.homework.payment.entity.Payment;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,5 +23,13 @@ public class Header {
 
     public String getStringData() {
         return StringDataGenerator.getStringData(this);
+    }
+
+    public static Header getPay(PayReqDto payReqDto) {
+
+        return Header.builder()
+                .payType(Payment.PayType.PAY)
+                .payId(payReqDto.getPayId())
+                .build();
     }
 }

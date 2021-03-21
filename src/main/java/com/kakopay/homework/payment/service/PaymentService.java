@@ -1,9 +1,11 @@
 package com.kakopay.homework.payment.service;
 
-import com.kakopay.homework.payment.controller.vo.PayResVo;
 import com.kakopay.homework.payment.dto.CancelDto;
 import com.kakopay.homework.payment.dto.PayReqDto;
 import com.kakopay.homework.payment.entity.Payment;
+import com.kakopay.homework.payment.external.linkdata.stringdata.Body;
+import com.kakopay.homework.payment.external.linkdata.stringdata.Header;
+import com.kakopay.homework.payment.external.linkdata.stringdata.StringData;
 import com.kakopay.homework.payment.repository.PaymentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +27,14 @@ public class PaymentService {
     public static List<String> CARD_DATA = new ArrayList<>();
 
     @Transactional
-    public PayResVo pay(PayReqDto reqDto) throws Exception {
+    public StringData pay(PayReqDto reqDto) throws Exception {
 
         checkDuplicatedCardData(reqDto.getCardData());
-        paymentRepository.save(Payment.get(reqDto));
+        StringData data = new StringData(Header.getPay((reqDto)), Body.getPay(reqDto));
+        paymentRepository.save(Payment.get(reqDto, data.toString()));
         removeCardData(reqDto.getCardData());
 
-        return null;
+        return data;
     }
 
     @Transactional

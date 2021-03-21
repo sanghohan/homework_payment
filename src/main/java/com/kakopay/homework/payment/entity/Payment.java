@@ -44,7 +44,7 @@ public class Payment {
     private String cardData;
 
     @Column(length = 450)
-    private String LinkedData;
+    private String linkedData;
 
     @Enumerated(EnumType.STRING)
     private PayStatus status;
@@ -54,6 +54,7 @@ public class Payment {
 
     @Column(nullable = false)
     private LocalDateTime updDt;
+
 
     public enum PayStatus {
         PAID,
@@ -68,7 +69,8 @@ public class Payment {
 
 
     @Builder(builderClassName = "PayBuilder", builderMethodName = "payBuilder", buildMethodName = "payBuild")
-    public Payment(String payId, Integer payAmount, Integer payVat, Integer installmentMonths, String cardData) {
+    public Payment(String payId, Integer payAmount, Integer payVat, Integer installmentMonths, String cardData
+                        , String linkedData) {
 
         Assert.hasLength(payId, "payId must not be empty");
         Assert.state(payAmount > 100, "payAmount must not be bigger than 100");
@@ -77,17 +79,19 @@ public class Payment {
         this.payId = payId;
         this.payAmount = payAmount;
         this.cancelAmount = 0;
+        this.cancelVat = 0;
         this.installmentMonths = installmentMonths;
-        this.payVat =  PayDataUtil.getVat(payAmount);
+        this.payVat =  PayDataUtil.getVat(payVat, payAmount);
         this.payType = PayType.PAY;
         this.status = PayStatus.PAID;
         this.cardData = cardData;
+        this.linkedData = linkedData;
         this.regDt = LocalDateTime.now();
         this.updDt = LocalDateTime.now();
     }
 
     @Builder(builderClassName = "CancelBuilder", builderMethodName = "cancelBuilder", buildMethodName = "cancelBuild")
-    public Payment(String payId, Integer cancelAmount, Integer cancelVat, String cardData) {
+    public Payment(String payId, Integer cancelAmount, Integer cancelVat, String cardData, String linkedData) {
 
         Assert.hasLength(payId, "payId must not be empty");
         Assert.state(cancelAmount == 0, "cancelAmount must not be bigger than 0");
@@ -97,14 +101,15 @@ public class Payment {
         this.cancelAmount = cancelAmount;
         this.payAmount = 0;
         this.installmentMonths = 0;
-        this.cancelVat = PayDataUtil.getVat(cancelAmount);
+        this.cancelVat = PayDataUtil.getVat(cancelVat, cancelAmount);
         this.payType = PayType.CANCEL;
         this.cardData = cardData;
+        this.linkedData = linkedData;
         this.regDt = LocalDateTime.now();
         this.updDt = LocalDateTime.now();
     }
 
-    public static Payment get(PayReqDto reqDto) throws Exception {
+    public static Payment get(PayReqDto reqDto, String linkedData) throws Exception {
 
         Payment payment = Payment.payBuilder()
                 .payId(reqDto.getPayId())
@@ -112,6 +117,7 @@ public class Payment {
                 .payVat(reqDto.getPayVat())
                 .installmentMonths(reqDto.getInstallmentMonths())
                 .cardData(PayDataUtil.getEncCardData(reqDto.getCardData()))
+                .linkedData(linkedData)
                 .payBuild();
 
         return payment;

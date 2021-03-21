@@ -1,5 +1,7 @@
 package com.kakopay.homework.payment.external.linkdata.stringdata;
 
+import com.kakopay.homework.payment.controller.vo.CardDataVo;
+import com.kakopay.homework.payment.dto.PayReqDto;
 import com.kakopay.homework.payment.util.PayDataUtil;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,14 +32,15 @@ public class Body {
     private int vat;
 
     @FixedLengthField(fieldSet = FieldSet.STRING, length = 20)
-    private String orgPayId;
+    @Builder.Default
+    private String orgPayId = " ";
 
     @FixedLengthField(fieldSet = FieldSet.STRING, length = 300)
     private String encryptedCardData;
 
     @FixedLengthField(fieldSet = FieldSet.RESERVED, length = 47)
     @Builder.Default
-    private String reserved=" ";
+    private String reserved = " ";
 
     public String getStringData() {
         return StringDataGenerator.getStringData(this);
@@ -57,7 +60,7 @@ public class Body {
                 super.encryptedCardData(encryptedCardData);
 
                 if(super.vat == 0 )
-                    super.vat(PayDataUtil.getVat(super.transactionAmount));
+                    super.vat(PayDataUtil.getVat(super.vat, super.transactionAmount));
 
             } catch (Exception e) {
                 log.error(e.getMessage());
@@ -66,6 +69,20 @@ public class Body {
 
             return super.build();
         }
+    }
+
+    public static Body getPay(PayReqDto payReqDto) throws Exception {
+
+        CardDataVo cardDataVo = PayDataUtil.getCardDataObj(payReqDto.getCardData());
+        return Body.builder()
+                .cardNum(cardDataVo.getCardNum())
+                .validPeriod(cardDataVo.getValidPeriod())
+                .cvc(cardDataVo.getCvc())
+                .installmentMonths(payReqDto.getInstallmentMonths())
+                .transactionAmount(payReqDto.getPayAmount())
+                .vat(payReqDto.getPayVat())
+                .build();
+
     }
 
 
