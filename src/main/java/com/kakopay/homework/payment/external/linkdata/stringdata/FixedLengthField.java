@@ -11,7 +11,6 @@ import java.lang.annotation.Target;
 public @interface FixedLengthField {
 
     FieldSet fieldSet() default FieldSet.NUMBER;
-    char padChar() default ' ';
     int length() default 0;
 
 }
