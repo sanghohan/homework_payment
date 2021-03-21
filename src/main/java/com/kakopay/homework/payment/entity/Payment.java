@@ -1,7 +1,8 @@
 package com.kakopay.homework.payment.entity;
 
+import com.kakopay.homework.payment.dto.PayReqDto;
+import com.kakopay.homework.payment.util.PayDataUtil;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
@@ -25,19 +26,19 @@ public class Payment {
     private PayType payType;
 
     @Column(nullable = false)
-    private Long payAmount;
+    private Integer payAmount;
 
     @Column(nullable = true)
-    private Long cancelAmount;
+    private Integer cancelAmount;
 
     @Column(nullable = false)
     private Integer installmentMonths;
 
     @Column
-    private Long payVat;
+    private Integer payVat;
 
     @Column
-    private Long cancelVat;
+    private Integer cancelVat;
 
     @Column(nullable = false)
     private String cardData;
@@ -67,7 +68,7 @@ public class Payment {
 
 
     @Builder(builderClassName = "PayBuilder", builderMethodName = "payBuilder", buildMethodName = "payBuild")
-    public Payment(String payId, Long payAmount, Long payVat, Integer installmentMonths, String cardData) {
+    public Payment(String payId, Integer payAmount, Integer payVat, Integer installmentMonths, String cardData) {
 
         Assert.hasLength(payId, "payId must not be empty");
         Assert.state(payAmount > 100, "payAmount must not be bigger than 100");
@@ -75,9 +76,9 @@ public class Payment {
 
         this.payId = payId;
         this.payAmount = payAmount;
-        this.cancelAmount = 0L;
+        this.cancelAmount = 0;
         this.installmentMonths = installmentMonths;
-        this.payVat =  payVat > 0 ? payVat : Long.valueOf(Math.round(payAmount/11));
+        this.payVat =  getVat(payAmount);
         this.payType = PayType.PAY;
         this.status = PayStatus.PAID;
         this.cardData = cardData;
@@ -86,7 +87,7 @@ public class Payment {
     }
 
     @Builder(builderClassName = "CancelBuilder", builderMethodName = "cancelBuilder", buildMethodName = "cancelBuild")
-    public Payment(String payId, Long cancelAmount, Long cancelVat, String cardData) {
+    public Payment(String payId, Integer cancelAmount, Integer cancelVat, String cardData) {
 
         Assert.hasLength(payId, "payId must not be empty");
         Assert.state(cancelAmount == 0, "cancelAmount must not be bigger than 0");
@@ -94,14 +95,30 @@ public class Payment {
 
         this.payId = payId;
         this.cancelAmount = cancelAmount;
-        this.payAmount = 0l;
+        this.payAmount = 0;
         this.installmentMonths = 0;
-        this.cancelVat = cancelVat > 0 ? cancelVat : Long.valueOf(Math.round(cancelAmount/11));
+        this.cancelVat = getVat(cancelAmount);
         this.payType = PayType.CANCEL;
         this.cardData = cardData;
         this.regDt = LocalDateTime.now();
         this.updDt = LocalDateTime.now();
     }
 
+    public static Payment get(PayReqDto reqDto) throws Exception {
+
+        Payment payment = Payment.payBuilder()
+                .payId(reqDto.getPayId())
+                .payAmount(reqDto.getPayAmount())
+                .payVat(reqDto.getPayVat())
+                .installmentMonths(reqDto.getInstallmentMonths())
+                .cardData(PayDataUtil.getEncCardData(reqDto.getCardData()))
+                .payBuild();
+
+        return payment;
+    }
+
+    private Integer getVat(Integer value) {
+        return value != null ? value : Math.round(value/11);
+    }
 
 }

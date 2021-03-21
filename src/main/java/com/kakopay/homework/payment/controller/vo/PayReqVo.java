@@ -1,13 +1,14 @@
 package com.kakopay.homework.payment.controller.vo;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
-import org.hibernate.validator.constraints.CreditCardNumber;
 
 import javax.validation.constraints.*;
 
 @Getter
 @ToString
+@Builder
 public class PayReqVo {
 
     @NotNull
@@ -30,10 +31,10 @@ public class PayReqVo {
 
     @Min(100)
     @Max(1000000000)
-    private Long payAmount;
+    private Integer payAmount;
 
     @Min(0)
     @Max(1000000000)
-    private Long vat;
+    private Integer vat;
 
 }

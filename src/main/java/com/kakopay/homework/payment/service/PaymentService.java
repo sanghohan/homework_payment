@@ -5,7 +5,6 @@ import com.kakopay.homework.payment.dto.CancelDto;
 import com.kakopay.homework.payment.dto.PayReqDto;
 import com.kakopay.homework.payment.entity.Payment;
 import com.kakopay.homework.payment.repository.PaymentRepository;
-import com.kakopay.homework.payment.util.PayDataUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,17 +28,7 @@ public class PaymentService {
     public PayResVo pay(PayReqDto reqDto) throws Exception {
 
         checkDuplicatedCardData(reqDto.getCardData());
-
-        Payment payment = Payment.payBuilder()
-                .payId(reqDto.getPayId())
-                .payAmount(reqDto.getPayAmount())
-                .payVat(reqDto.getPayVat())
-                .installmentMonths(reqDto.getInstallmentMonths())
-                .cardData(PayDataUtil.getEncCardData(reqDto.getCardData()))
-                .payBuild();
-
-        paymentRepository.save(payment);
-
+        paymentRepository.save(Payment.get(reqDto));
         removeCardData(reqDto.getCardData());
 
         return null;
@@ -49,7 +38,7 @@ public class PaymentService {
     public CancelDto cancel(CancelDto reqDto) {
 
         Payment payment = Payment.cancelBuilder()
-                .cancelAmount(100L)
+                .cancelAmount(100)
                 .cardData("test")
                 .cancelBuild();
 
