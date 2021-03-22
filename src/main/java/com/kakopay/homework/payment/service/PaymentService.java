@@ -12,9 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 @Slf4j
@@ -24,13 +23,13 @@ public class PaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    public static List<String> CARD_DATA = new ArrayList<>();
+    private static Queue<String> cardDATAqueue = new ConcurrentLinkedQueue<>();
 
     @Transactional
     public StringData pay(PayReqDto reqDto) throws Exception {
 
         checkDuplicatedCardData(reqDto.getCardData());
-        StringData data = new StringData(Header.getPay((reqDto)), Body.getPay(reqDto));
+        StringData data = new StringData(reqDto.getPayId(), Header.getPay((reqDto)), Body.getPay(reqDto));
         paymentRepository.save(Payment.get(reqDto, data.toString()));
         removeCardData(reqDto.getCardData());
 
@@ -48,23 +47,18 @@ public class PaymentService {
         return new CancelDto();
     }
 
-    private static void checkDuplicatedCardData(String cardData) throws Exception{
+    private static void checkDuplicatedCardData(String cardData) throws Exception {
 
-        synchronized(CARD_DATA) {
+        if (cardDATAqueue.contains(cardData))
+            throw new Exception("동시에 같은 카드로 결제 할수 없습니다.");
 
-            if (CARD_DATA.contains(cardData))
-                throw new Exception("동시에 같은 카드로 결제 할수 없습니다.");
+        cardDATAqueue.add(cardData);
 
-            CARD_DATA.add(cardData);
-        }
 
     }
+
     private static void removeCardData(String cardData) {
-
-        synchronized(CARD_DATA) {
-            CARD_DATA.remove(cardData);
-        }
-
+        cardDATAqueue.remove(cardData);
     }
 
 

@@ -80,7 +80,7 @@ public class Body {
                 .cvc(cardDataVo.getCvc())
                 .installmentMonths(payReqDto.getInstallmentMonths())
                 .transactionAmount(payReqDto.getPayAmount())
-                .vat(payReqDto.getPayVat())
+                .vat(PayDataUtil.getVat(payReqDto.getPayVat(), payReqDto.getPayAmount()))
                 .build();
 
     }
