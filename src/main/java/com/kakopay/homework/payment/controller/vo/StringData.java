@@ -1,12 +1,15 @@
 package com.kakopay.homework.payment.controller.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kakopay.homework.payment.external.linkdata.stringdata.Body;
 import com.kakopay.homework.payment.external.linkdata.stringdata.Header;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+@NoArgsConstructor
 public class StringData {
 
     private String txId;
