@@ -1,6 +1,8 @@
 package com.kakopay.homework.payment.entity;
 
-import com.kakopay.homework.payment.dto.PayReqDto;
+import com.kakopay.homework.payment.controller.vo.CardDataVo;
+import com.kakopay.homework.payment.dto.CancelDto;
+import com.kakopay.homework.payment.dto.PayDto;
 import com.kakopay.homework.payment.util.PayDataUtil;
 import lombok.*;
 import org.springframework.util.Assert;
@@ -8,46 +10,49 @@ import org.springframework.util.Assert;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static com.kakopay.homework.payment.util.PayDataUtil.getVat;
+
 @Entity
-@Table(name = "PAYMENT")
+@Table(indexes = {@Index(name = "idx_payment", columnList = "txId")})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = { "id", "payId" } )
+@EqualsAndHashCode(of = {"txId"})
 public class Payment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(nullable = false, length = 20)
-    private String payId;
+    private String txId;
 
     @Enumerated(EnumType.STRING)
     private PayType payType;
 
     @Column(nullable = false)
-    private Integer payAmount;
-
-    @Column(nullable = true)
-    private Integer cancelAmount;
+    private String cardData;
 
     @Column(nullable = false)
-    private Integer installmentMonths;
+    private String installmentMonths;
+
+    @Column(nullable = false)
+    private Integer payAmount;
 
     @Column
     private Integer payVat;
 
     @Column
+    @Version
+    private Integer cancelAmount;
+
+    @Column
     private Integer cancelVat;
 
-    @Column(nullable = false)
-    private String cardData;
-
-    @Column(length = 450)
+    @Column(length = 500)
     private String linkedData;
 
     @Enumerated(EnumType.STRING)
     private PayStatus status;
+
+    @Column
+    private String orgPayTxId;
 
     @Column(nullable = false)
     private LocalDateTime regDt;
@@ -55,6 +60,9 @@ public class Payment {
     @Column(nullable = false)
     private LocalDateTime updDt;
 
+    @Column
+    @Version
+    private int version;
 
     public enum PayStatus {
         PAID,
@@ -69,19 +77,19 @@ public class Payment {
 
 
     @Builder(builderClassName = "PayBuilder", builderMethodName = "payBuilder", buildMethodName = "payBuild")
-    public Payment(String payId, Integer payAmount, Integer payVat, Integer installmentMonths, String cardData
-                        , String linkedData) {
+    public Payment(String txId, Integer payAmount, Integer payVat, Integer installmentMonths, String cardData
+            , String linkedData) {
 
-        Assert.hasLength(payId, "payId must not be empty");
+        Assert.hasLength(txId, "txId must not be empty");
         Assert.state(payAmount > 100, "payAmount must not be bigger than 100");
         Assert.hasLength(cardData, "cardData must not be empty");
 
-        this.payId = payId;
+        this.txId = txId;
         this.payAmount = payAmount;
         this.cancelAmount = 0;
         this.cancelVat = 0;
-        this.installmentMonths = installmentMonths;
-        this.payVat =  PayDataUtil.getVat(payVat, payAmount);
+        this.installmentMonths = String.valueOf(installmentMonths);
+        this.payVat = getVat(payVat, payAmount);
         this.payType = PayType.PAY;
         this.status = PayStatus.PAID;
         this.cardData = cardData;
@@ -91,37 +99,87 @@ public class Payment {
     }
 
     @Builder(builderClassName = "CancelBuilder", builderMethodName = "cancelBuilder", buildMethodName = "cancelBuild")
-    public Payment(String payId, Integer cancelAmount, Integer cancelVat, String cardData, String linkedData) {
+    public Payment(String txId, Integer cancelAmount, Integer cancelVat, String cardData, String linkedData,
+                   String orgPayTxId) {
 
-        Assert.hasLength(payId, "payId must not be empty");
-        Assert.state(cancelAmount == 0, "cancelAmount must not be bigger than 0");
+        Assert.hasLength(txId, "txId must not be empty");
+        Assert.state(cancelAmount > 0, "cancelAmount must not be bigger than 0");
         Assert.hasLength(cardData, "cardData must not be empty");
 
-        this.payId = payId;
+        this.txId = txId;
         this.cancelAmount = cancelAmount;
         this.payAmount = 0;
-        this.installmentMonths = 0;
-        this.cancelVat = PayDataUtil.getVat(cancelVat, cancelAmount);
+        this.installmentMonths = "00";
+        this.cancelVat = getVat(cancelVat, cancelAmount);
         this.payType = PayType.CANCEL;
         this.cardData = cardData;
         this.linkedData = linkedData;
+        this.orgPayTxId = orgPayTxId;
         this.regDt = LocalDateTime.now();
         this.updDt = LocalDateTime.now();
     }
 
-    public static Payment get(PayReqDto reqDto, String linkedData) throws Exception {
+    public static Payment getPay(PayDto reqDto, String linkedData) throws Exception {
 
-        Payment payment = Payment.payBuilder()
-                .payId(reqDto.getPayId())
+        return Payment.payBuilder()
+                .txId(reqDto.getTxId())
                 .payAmount(reqDto.getPayAmount())
                 .payVat(reqDto.getPayVat())
                 .installmentMonths(reqDto.getInstallmentMonths())
                 .cardData(PayDataUtil.getEncCardData(reqDto.getCardData()))
                 .linkedData(linkedData)
                 .payBuild();
+    }
 
-        return payment;
+    public static Payment getCancel(CancelDto cancelDto, String cardData, String linkedData, String orgPayTxId) throws Exception {
+
+        return Payment.cancelBuilder()
+                .txId(cancelDto.getTxId())
+                .cancelAmount(cancelDto.getCancelAmount())
+                .cancelVat(cancelDto.getCancelVat())
+                .cardData(PayDataUtil.getEncCardData(cardData))
+                .linkedData(linkedData)
+                .orgPayTxId(orgPayTxId)
+                .cancelBuild();
+    }
+
+    public void cancel(CancelDto cancelDto) throws Exception {
+
+        checkCancelPolicy(cancelDto);
+        cancelAmount += cancelDto.getCancelAmount();
+        cancelVat += cancelDto.getCancelVat();
+
+        if (cancelAmount.equals(payAmount)) {
+            status = PayStatus.CANCELD;
+        } else {
+            status = PayStatus.PARTIALLY_CANCELLED;
+        }
+
+        updDt = LocalDateTime.now();
+
+    }
+
+    private void checkCancelPolicy(CancelDto cancelDto) throws Exception {
+
+        if (cancelDto.getCancelAmount() > getRemainAmount())
+            throw new Exception("취소 요청 금액이 남은 결제금액보다 큽니다.");
+
+        if (cancelDto.getCancelVat() > getRemainingVat())
+            throw new Exception("취소 요청 부가세 금액이 남은 결제 부가세 금액 보다 큽니다.");
+
     }
 
 
+    public int getRemainAmount() {
+        return payAmount - cancelAmount;
+    }
+
+    public int getRemainingVat() {
+        return this.payVat - this.cancelVat;
+    }
+
+    public CardDataVo getCardData() throws Exception {
+
+        return PayDataUtil.getDecCardData(cardData);
+    }
 }

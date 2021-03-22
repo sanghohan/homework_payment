@@ -15,20 +15,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PayDataUtilTest {
 
     @Test
-    @DisplayName("payId 중복 생성 테스트")
+    @DisplayName("txId 중복 생성 테스트")
     void getPayIdTest() {
 
         List<String> checkList = new ArrayList<>();
 
         for (int i = 0; i < 1000; i++) {
-            String payId = PayDataUtil.generatePayId();
-            assertThat(payId.length()).isEqualTo(20);
+            String txId = PayDataUtil.generateTxId();
+            assertThat(txId.length()).isEqualTo(20);
 
-            if(i>0 && checkList.contains(payId))
+            if(i>0 && checkList.contains(txId))
                 Assertions.fail();
 
-            checkList.add(payId);
-            log.debug("line number {} : {}", i+1, payId);
+            checkList.add(txId);
+            log.debug("line number {} : {}", i+1, txId);
         }
     }
 

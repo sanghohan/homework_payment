@@ -1,7 +1,8 @@
 package com.kakopay.homework.payment.external.linkdata.stringdata;
 
 import com.kakopay.homework.payment.controller.vo.CardDataVo;
-import com.kakopay.homework.payment.dto.PayReqDto;
+import com.kakopay.homework.payment.dto.CancelDto;
+import com.kakopay.homework.payment.dto.PayDto;
 import com.kakopay.homework.payment.util.PayDataUtil;
 import lombok.Builder;
 import lombok.Getter;
@@ -71,16 +72,29 @@ public class Body {
         }
     }
 
-    public static Body getPay(PayReqDto payReqDto) throws Exception {
+    public static Body getPay(PayDto payDto) throws Exception {
 
-        CardDataVo cardDataVo = PayDataUtil.getCardDataObj(payReqDto.getCardData());
+        CardDataVo cardDataVo = PayDataUtil.getCardDataObj(payDto.getCardData());
         return Body.builder()
                 .cardNum(cardDataVo.getCardNum())
                 .validPeriod(cardDataVo.getValidPeriod())
                 .cvc(cardDataVo.getCvc())
-                .installmentMonths(payReqDto.getInstallmentMonths())
-                .transactionAmount(payReqDto.getPayAmount())
-                .vat(PayDataUtil.getVat(payReqDto.getPayVat(), payReqDto.getPayAmount()))
+                .installmentMonths(payDto.getInstallmentMonths())
+                .transactionAmount(payDto.getPayAmount())
+                .vat(PayDataUtil.getVat(payDto.getPayVat(), payDto.getPayAmount()))
+                .build();
+
+    }
+
+    public static Body getCancel(CancelDto cancelDto, CardDataVo cardDataVo) {
+
+        return Body.builder()
+                .cardNum(cardDataVo.getCardNum())
+                .validPeriod(cardDataVo.getValidPeriod())
+                .cvc(cardDataVo.getCvc())
+                .installmentMonths(0)
+                .transactionAmount(cancelDto.getCancelAmount())
+                .vat(cancelDto.getCancelVat())
                 .build();
 
     }

@@ -24,7 +24,6 @@ public class PayReqVo {
     @Digits(integer = 3, fraction = 0, message = "Wrong CVV")
     private String cvc;
 
-
     @Min(0)
     @Max(12)
     private Integer installmentMonths;

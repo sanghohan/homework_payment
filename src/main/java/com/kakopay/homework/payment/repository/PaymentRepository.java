@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface PaymentRepository {
 
-    List<Payment> findPaymentsByPayId(String payid);
+    List<Payment> findPaymentsByTxId(String txId);
     void save(Payment payment);
+    Payment findCancellablePaymentByTxId(String txId);
 }

@@ -1,6 +1,7 @@
 package com.kakopay.homework.payment.controller;
 
 import com.kakopay.homework.payment.controller.vo.PayErrorVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.persistence.EntityNotFoundException;
 
 @RestControllerAdvice
+@Slf4j
 public class PayControllerAdvice {
 
     @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class, EntityNotFoundException.class})
@@ -19,11 +21,12 @@ public class PayControllerAdvice {
         return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({Exception.class})
-    public ResponseEntity<PayErrorVo> handleInternalServerError() {
-        PayErrorVo responseBody = PayErrorVo.builder()
-            .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    @ExceptionHandler({RuntimeException.class})
+    public ResponseEntity<PayErrorVo> handleInternalServerError(Exception e) {
 
+        log.error("==================== handlerRuntimeException ====================");
+        e.printStackTrace();
+        PayErrorVo responseBody = PayErrorVo.builder().httpStatus(HttpStatus.INTERNAL_SERVER_ERROR).build();
         return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

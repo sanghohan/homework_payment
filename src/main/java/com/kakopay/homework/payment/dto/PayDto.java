@@ -7,25 +7,23 @@ import lombok.*;
 @Builder
 @Getter
 @ToString
-public class PayReqDto {
+public class PayDto {
 
-    private String payId;
+    private String txId;
     private Integer payAmount;
     private Integer payVat;
     private Integer installmentMonths;
     private String cardData;
 
-    public static PayReqDto get(PayReqVo payReqVo) {
+    public static PayDto get(PayReqVo payReqVo) {
 
-        PayReqDto reqDto = PayReqDto.builder()
-                .payId(PayDataUtil.generatePayId())
+        return PayDto.builder()
+                .txId(PayDataUtil.generateTxId())
                 .payAmount(payReqVo.getPayAmount())
                 .payVat(payReqVo.getVat())
                 .installmentMonths(payReqVo.getInstallmentMonths())
                 .cardData(PayDataUtil.getCardData(payReqVo.getCardNum(), payReqVo.getValidPeriod(), payReqVo.getCvc()))
                 .build();
-
-        return reqDto;
     }
 
 }

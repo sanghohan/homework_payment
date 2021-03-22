@@ -18,7 +18,7 @@ public class StringDataGeneratorTest {
     void setUp() {
 
         header = Header.builder()
-                .payId(PayDataUtil.generatePayId())
+                .txId(PayDataUtil.generateTxId())
                 .payType(Payment.PayType.PAY)
                 .build();
 

@@ -29,7 +29,17 @@ public class PaymentRepositoryImpl extends QuerydslRepositorySupport implements 
     }
 
     @Override
-    public List<Payment> findPaymentsByPayId(String payid) {
+    public Payment findCancellablePaymentByTxId(String txId) {
+
+        return queryFactory.selectFrom($)
+                .where(QPayment.payment.txId.eq(txId)
+                .and(QPayment.payment.status.eq(Payment.PayStatus.PAID)
+                    .or(QPayment.payment.status.eq(Payment.PayStatus.PARTIALLY_CANCELLED))
+                )).fetchOne();
+    }
+
+    @Override
+    public List<Payment> findPaymentsByTxId(String txId) {
         return null;
     }
 

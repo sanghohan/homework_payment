@@ -1,17 +1,20 @@
 package com.kakopay.homework.payment.service;
 
+import com.kakopay.homework.payment.controller.vo.StringData;
 import com.kakopay.homework.payment.dto.CancelDto;
-import com.kakopay.homework.payment.dto.PayReqDto;
+import com.kakopay.homework.payment.dto.PayDto;
 import com.kakopay.homework.payment.entity.Payment;
 import com.kakopay.homework.payment.external.linkdata.stringdata.Body;
 import com.kakopay.homework.payment.external.linkdata.stringdata.Header;
-import com.kakopay.homework.payment.external.linkdata.stringdata.StringData;
 import com.kakopay.homework.payment.repository.PaymentRepository;
+import com.kakopay.homework.payment.util.PayDataUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -23,43 +26,94 @@ public class PaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    private static Queue<String> cardDATAqueue = new ConcurrentLinkedQueue<>();
+    @Autowired
+    private EntityManager em;
+
+    private static Queue<String> payCardDATAqueue = new ConcurrentLinkedQueue<>();
+    private static Queue<String> cancelTxIdqueue = new ConcurrentLinkedQueue<>();
 
     @Transactional
-    public StringData pay(PayReqDto reqDto) throws Exception {
+    public StringData pay(PayDto reqDto) throws Exception {
 
-        checkDuplicatedCardData(reqDto.getCardData());
-        StringData data = new StringData(reqDto.getPayId(), Header.getPay((reqDto)), Body.getPay(reqDto));
-        paymentRepository.save(Payment.get(reqDto, data.toString()));
-        removeCardData(reqDto.getCardData());
+        try {
+            checkDuplicatedCardData(reqDto.getCardData());
+            StringData data = new StringData(reqDto.getTxId(), Header.getPay((reqDto)), Body.getPay(reqDto));
+            paymentRepository.save(Payment.getPay(reqDto, data.getStringData()));
+            return data;
 
-        return data;
+        } finally {
+            removeCardData(reqDto.getCardData());
+        }
     }
 
     @Transactional
-    public CancelDto cancel(CancelDto reqDto) {
+    public StringData cancel(CancelDto reqDto) throws Exception {
 
-        Payment payment = Payment.cancelBuilder()
-                .cancelAmount(100)
-                .cardData("test")
-                .cancelBuild();
+        try {
+            checkDuplicatedCancelRequest(reqDto.getOrgPayTxId());
 
-        return new CancelDto();
+            Payment payment = paymentRepository.findCancellablePaymentByTxId(reqDto.getOrgPayTxId());
+
+            validateCancelRequest(payment, reqDto);
+            payment.cancel(reqDto);
+            //em.flush();
+            return insertCancelData(payment, reqDto);
+
+        } finally {
+            removeCancelRequest(reqDto.getOrgPayTxId());
+        }
+
+
+    }
+
+    private void validateCancelRequest(Payment payment, CancelDto reqDto) throws Exception {
+
+        if (ObjectUtils.isEmpty(payment))
+            throw new Exception("취소할 txId가 존재하지 않습니다. : " + reqDto.getOrgPayTxId());
+
+        if (Payment.PayStatus.CANCELD.equals(payment.getStatus()))
+            throw new Exception("취소 완료된 결제입니다. : " + reqDto.getOrgPayTxId());
+    }
+
+    private StringData insertCancelData(Payment payment, CancelDto reqDto) throws Exception {
+
+        StringData data = new StringData(reqDto.getTxId(),
+                Header.getCancel((reqDto)), Body.getCancel(reqDto, payment.getCardData()));
+
+        String cardData = PayDataUtil.getCardData(payment.getCardData());
+
+        paymentRepository.save(Payment.getCancel(reqDto, cardData,
+                data.getStringData(), reqDto.getOrgPayTxId()));
+
+        return data;
+
     }
 
     private static void checkDuplicatedCardData(String cardData) throws Exception {
 
-        if (cardDATAqueue.contains(cardData))
+        if (payCardDATAqueue.contains(cardData))
             throw new Exception("동시에 같은 카드로 결제 할수 없습니다.");
 
-        cardDATAqueue.add(cardData);
+        payCardDATAqueue.add(cardData);
 
 
     }
 
     private static void removeCardData(String cardData) {
-        cardDATAqueue.remove(cardData);
+        payCardDATAqueue.remove(cardData);
     }
 
+    private static void checkDuplicatedCancelRequest(String txId) throws Exception {
 
+        if (cancelTxIdqueue.contains(txId))
+            throw new Exception("동시에 같은 결제건을 취소 할수 없습니다.");
+
+        cancelTxIdqueue.add(txId);
+
+
+    }
+
+    private static void removeCancelRequest(String txId) {
+        cancelTxIdqueue.remove(txId);
+    }
 }

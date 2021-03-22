@@ -11,7 +11,7 @@ import java.util.StringJoiner;
 @Slf4j
 public class PayDataUtil {
 
-    public static String generatePayId() {
+    public static String generateTxId() {
 
         return System.currentTimeMillis() + RandomString.make(7);
     }
@@ -25,15 +25,24 @@ public class PayDataUtil {
 
     }
 
+    public static String getCardData(CardDataVo cardDataVo) {
+
+        return new StringJoiner("|")
+                .add(cardDataVo.getCardNum())
+                .add(cardDataVo.getValidPeriod())
+                .add(cardDataVo.getCvc()).toString();
+
+    }
+
     public static String getEncCardData(String combinedCardData) throws Exception {
 
-        return AES256Cipher.getInstance().AES_Encode(combinedCardData);
+        return AES128Cipher.AES_Encode(combinedCardData);
     }
 
     public static String getEncCardData(String cardNum, String validPeriod, String cvc) throws Exception {
 
         String combinedCardData = getCardData(cardNum, validPeriod, cvc);
-        return AES256Cipher.getInstance().AES_Encode(combinedCardData);
+        return AES128Cipher.AES_Encode(combinedCardData);
 
     }
 
@@ -42,7 +51,7 @@ public class PayDataUtil {
         if (!StringUtils.hasLength(encCardData))
             throw new Exception("wrong card data!");
 
-        String decCardData = AES256Cipher.getInstance().AES_Decode(encCardData);
+        String decCardData = AES128Cipher.AES_Decode(encCardData);
         CardDataVo cardDataVo = getCardDataObj(decCardData);
 
         return CardDataVo.builder()
@@ -72,9 +81,11 @@ public class PayDataUtil {
 
     public static Integer getVat(Integer vat, Integer amount) {
 
-        if(ObjectUtils.isEmpty(vat))
-            vat = Integer.valueOf(0);
+        return ObjectUtils.isEmpty(vat) ? Math.round(amount / 11) : vat;
+    }
 
-        return vat == 0 ? Math.round(amount / 11) : vat;
+    public static Integer getVat(Integer amount) {
+
+        return Math.round(amount / 11);
     }
 }
