@@ -1,5 +1,6 @@
 package com.kakopay.homework.payment.util;
 
+import com.kakopay.homework.payment.Exception.PayException;
 import com.kakopay.homework.payment.controller.vo.CardDataVo;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.utility.RandomString;
@@ -49,7 +50,7 @@ public class PayDataUtil {
     public static CardDataVo getDecCardData(String encCardData) throws Exception {
 
         if (!StringUtils.hasLength(encCardData))
-            throw new Exception("wrong card data!");
+            throw new PayException("PAY_2001", encCardData);
 
         String decCardData = AES128Cipher.AES_Decode(encCardData);
         CardDataVo cardDataVo = getCardDataObj(decCardData);
@@ -64,12 +65,12 @@ public class PayDataUtil {
 
     public static CardDataVo getCardDataObj(String cardData) throws Exception {
 
-        log.debug("decCardData : {}", cardData);
+        //log.debug("decCardData : {}", cardData);
         String[] sepCardData = cardData.split("\\|");
-        log.debug("sepCardData.length : {}", sepCardData.length);
+        //log.debug("sepCardData.length : {}", sepCardData.length);
 
         if (sepCardData.length != 3)
-            throw new Exception("wrong card data!");
+            throw new PayException("PAY_2001", cardData);
 
         return CardDataVo.builder()
                 .cardNum(sepCardData[0])

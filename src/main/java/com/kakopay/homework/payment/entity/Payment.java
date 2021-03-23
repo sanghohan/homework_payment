@@ -1,10 +1,12 @@
 package com.kakopay.homework.payment.entity;
 
+import com.kakopay.homework.payment.Exception.PayException;
 import com.kakopay.homework.payment.controller.vo.CardDataVo;
 import com.kakopay.homework.payment.dto.CancelDto;
 import com.kakopay.homework.payment.dto.PayDto;
 import com.kakopay.homework.payment.util.PayDataUtil;
 import lombok.*;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
@@ -136,7 +138,7 @@ public class Payment {
         return Payment.cancelBuilder()
                 .txId(cancelDto.getTxId())
                 .cancelAmount(cancelDto.getCancelAmount())
-                .cancelVat(cancelDto.getCancelVat())
+                .cancelVat(cancelDto.getCalculatedVat())
                 .cardData(PayDataUtil.getEncCardData(cardData))
                 .linkedData(linkedData)
                 .orgPayTxId(orgPayTxId)
@@ -147,7 +149,7 @@ public class Payment {
 
         checkCancelPolicy(cancelDto);
         cancelAmount += cancelDto.getCancelAmount();
-        cancelVat += cancelDto.getCancelVat();
+        cancelVat += cancelDto.getCalculatedVat();
 
         if (cancelAmount.equals(payAmount)) {
             status = PayStatus.CANCELD;
@@ -162,11 +164,24 @@ public class Payment {
     private void checkCancelPolicy(CancelDto cancelDto) throws Exception {
 
         if (cancelDto.getCancelAmount() > getRemainAmount())
-            throw new Exception("취소 요청 금액이 결제 잔여 금액보다 큽니다.");
+            throw new PayException("PAY_3003", String.valueOf(cancelDto.getCancelAmount()), String.valueOf(getRemainAmount()));
 
-        if (cancelDto.getCancelVat() > getRemainingVat())
-            throw new Exception("취소 요청 부가세 금액이 부가세 잔여 금액 보다 큽니다.");
+        if (cancelDto.getCancelAmount().equals(getRemainAmount())) {
+            if(ObjectUtils.isEmpty(cancelDto.getReqCancelVat()) && cancelDto.getCalculatedVat() > getRemainingVat()) {
+                cancelDto.setCalculatedVat(getRemainingVat());
+            }
 
+            if(ObjectUtils.isNotEmpty(cancelDto.getReqCancelVat()) && cancelDto.getReqCancelVat() > getRemainingVat())
+                throw new PayException("PAY_3004", String.valueOf(getRemainingVat()));
+
+            if(ObjectUtils.isNotEmpty(cancelDto.getReqCancelVat()) && cancelDto.getReqCancelVat() < getRemainingVat())
+                throw new PayException("PAY_3005", String.valueOf(getRemainingVat()));
+
+            return;
+        }
+
+        if (cancelDto.getCalculatedVat() > getRemainingVat())
+            throw new PayException("PAY_3004", String.valueOf(cancelDto.getCalculatedVat()), String.valueOf(getRemainingVat()));
     }
 
 

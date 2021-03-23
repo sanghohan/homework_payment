@@ -1,32 +1,42 @@
 package com.kakopay.homework.payment.controller;
 
+import com.kakopay.homework.payment.Exception.PayException;
 import com.kakopay.homework.payment.controller.vo.PayErrorVo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.persistence.EntityNotFoundException;
+import java.util.Locale;
 
 @RestControllerAdvice
 @Slf4j
 public class PayControllerAdvice {
 
-    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class, EntityNotFoundException.class})
-    public ResponseEntity<PayErrorVo> handleBadRequest() {
-        PayErrorVo responseBody = PayErrorVo.builder()
-            .httpStatus(HttpStatus.BAD_REQUEST).build();
-
-        return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
-    }
+    @Autowired
+    private MessageSource messageSource;
 
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<PayErrorVo> handleInternalServerError(Exception e) {
 
         log.error("==================== handlerRuntimeException ====================");
         e.printStackTrace();
-        PayErrorVo responseBody = PayErrorVo.builder().httpStatus(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        PayErrorVo responseBody = PayErrorVo.serverErrorBuilder().httpStatus(HttpStatus.INTERNAL_SERVER_ERROR).build();
         return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler({PayException.class})
+    public ResponseEntity<PayErrorVo> handleInternalCheckedError(PayException e) {
+
+        log.error("==================== PayException ====================");
+        e.printStackTrace();
+        PayErrorVo responseBody = PayErrorVo.exceptionBuilder()
+                .code(e.getCode())
+                .message(messageSource.getMessage(e.getCode(), e.getArgs(), Locale.KOREA))
+                .build();
+        return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
 }

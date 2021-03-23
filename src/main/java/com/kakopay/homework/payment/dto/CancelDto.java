@@ -4,6 +4,7 @@ import com.kakopay.homework.payment.controller.vo.CancelReqVo;
 import com.kakopay.homework.payment.util.PayDataUtil;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Builder
 @Getter
@@ -11,7 +12,10 @@ public class CancelDto {
 
     private String txId;
     private Integer cancelAmount;
-    private Integer cancelVat;
+    private Integer reqCancelVat;
+
+    @Setter
+    private Integer calculatedVat;
     private String orgPayTxId;
 
     public static CancelDto get(CancelReqVo cancelReqVo) {
@@ -20,13 +24,15 @@ public class CancelDto {
                 .txId(PayDataUtil.generateTxId())
                 .orgPayTxId(cancelReqVo.getTxId())
                 .cancelAmount(cancelReqVo.getCancelAmount())
-                .cancelVat(cancelReqVo.getCancelVat())
+                .reqCancelVat(cancelReqVo.getCancelVat())
                 .build();
     }
 
-    public Integer getCancelVat() {
+    public Integer getCalculatedVat() {
 
-        return PayDataUtil.getVat(cancelVat, cancelAmount);
+        return PayDataUtil.getVat(reqCancelVat, cancelAmount);
 
     }
+
+
 }

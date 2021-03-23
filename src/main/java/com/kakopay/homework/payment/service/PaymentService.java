@@ -1,5 +1,6 @@
 package com.kakopay.homework.payment.service;
 
+import com.kakopay.homework.payment.Exception.PayException;
 import com.kakopay.homework.payment.controller.vo.StringData;
 import com.kakopay.homework.payment.dto.CancelDto;
 import com.kakopay.homework.payment.dto.PayDto;
@@ -69,10 +70,10 @@ public class PaymentService {
     private void validateCancelRequest(Payment payment, CancelDto reqDto) throws Exception {
 
         if (ObjectUtils.isEmpty(payment))
-            throw new Exception("취소할 txId가 존재하지 않습니다. : " + reqDto.getOrgPayTxId());
+            throw new PayException("PAY_3001", reqDto.getOrgPayTxId());
 
         if (Payment.PayStatus.CANCELD.equals(payment.getStatus()))
-            throw new Exception("취소 완료된 결제입니다. : " + reqDto.getOrgPayTxId());
+            throw new PayException("PAY_3002", reqDto.getOrgPayTxId());
     }
 
     private StringData insertCancelData(Payment payment, CancelDto reqDto) throws Exception {
@@ -92,7 +93,7 @@ public class PaymentService {
     private static void checkDuplicatedCardData(String cardData) throws Exception {
 
         if (payCardDATAqueue.contains(cardData))
-            throw new Exception("동시에 같은 카드로 결제 할수 없습니다.");
+            throw new PayException("PAY_4001");
 
         payCardDATAqueue.add(cardData);
 
@@ -106,7 +107,7 @@ public class PaymentService {
     private static void checkDuplicatedCancelRequest(String txId) throws Exception {
 
         if (cancelTxIdqueue.contains(txId))
-            throw new Exception("동시에 같은 결제건을 취소 할수 없습니다.");
+            throw new PayException("PAY_4002", txId);
 
         cancelTxIdqueue.add(txId);
 

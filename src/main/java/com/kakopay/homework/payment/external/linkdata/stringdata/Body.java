@@ -94,7 +94,7 @@ public class Body {
                 .cvc(cardDataVo.getCvc())
                 .installmentMonths(0)
                 .transactionAmount(cancelDto.getCancelAmount())
-                .vat(cancelDto.getCancelVat())
+                .vat(cancelDto.getCalculatedVat())
                 .build();
 
     }
