@@ -162,10 +162,10 @@ public class Payment {
     private void checkCancelPolicy(CancelDto cancelDto) throws Exception {
 
         if (cancelDto.getCancelAmount() > getRemainAmount())
-            throw new Exception("취소 요청 금액이 남은 결제금액보다 큽니다.");
+            throw new Exception("취소 요청 금액이 결제 잔여 금액보다 큽니다.");
 
         if (cancelDto.getCancelVat() > getRemainingVat())
-            throw new Exception("취소 요청 부가세 금액이 남은 결제 부가세 금액 보다 큽니다.");
+            throw new Exception("취소 요청 부가세 금액이 부가세 잔여 금액 보다 큽니다.");
 
     }
 

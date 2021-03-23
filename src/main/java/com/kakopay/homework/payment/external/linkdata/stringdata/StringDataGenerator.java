@@ -54,7 +54,7 @@ public class StringDataGenerator {
 
         if (ObjectUtils.isNotEmpty(fixedLengthType) && fixedLengthType.length() > 0) {
             Assert.state(fixedLengthType.length() == sumFieldStringLength,
-                    "sum field`s length must equal fixedLengthType.length()");
+                    "sum of field`s length must equal fixedLengthType.length()");
         }
     }
 
