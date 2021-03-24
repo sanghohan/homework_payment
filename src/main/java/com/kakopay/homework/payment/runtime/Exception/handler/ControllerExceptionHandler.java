@@ -1,7 +1,7 @@
-package com.kakopay.homework.payment.controller;
+package com.kakopay.homework.payment.runtime.Exception.handler;
 
-import com.kakopay.homework.payment.Exception.PayException;
-import com.kakopay.homework.payment.controller.vo.PayErrorVo;
+import com.kakopay.homework.payment.runtime.Exception.PayException;
+import com.kakopay.homework.payment.runtime.model.PayErrorVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -14,7 +14,7 @@ import java.util.Locale;
 
 @RestControllerAdvice
 @Slf4j
-public class PayControllerAdvice {
+public class ControllerExceptionHandler {
 
     @Autowired
     private MessageSource messageSource;

@@ -1,6 +1,7 @@
 package com.kakopay.homework.payment.util;
 
-import com.kakopay.homework.payment.controller.vo.CardDataVo;
+import com.kakopay.homework.payment.controller.vo.res.CardDataVo;
+import com.kakopay.homework.payment.dto.CardDataDto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +37,7 @@ class PayDataUtilTest {
     @DisplayName("카드데이터 생성 테스트")
     void getCardDataTest() {
 
-        String cardData = PayDataUtil.getCardData("cardNum", "validPeriod", "cvc");
+        String cardData = PayDataUtil.getCardStringData("cardNum", "validPeriod", "cvc");
         assertThat(cardData.equals("cardNum|validPeriod|cvc"));
     }
 
@@ -44,7 +45,7 @@ class PayDataUtilTest {
     @DisplayName("카드데이터 암호화 테스트")
     void getCardDataEncTest() throws Exception{
 
-        String cardData = PayDataUtil.getEncCardData("cardNum", "validPeriod", "cvc");
+        String cardData = PayDataUtil.getEncCardStringData("15126134125", "0922", "888");
         log.debug(cardData);
 
     }
@@ -53,8 +54,33 @@ class PayDataUtilTest {
     @DisplayName("카드데이터 복호화 테스트")
     void getCardDataDecTest() throws Exception{
 
-        CardDataVo cardDataVo = PayDataUtil.getDecCardData("Vr9ggh4LBWd7q99zUAH5DNl5B//W/5xdbjBslXC8n74=");
+        CardDataDto cardDataDto = PayDataUtil.getDecCardStringData("Vr9ggh4LBWd7q99zUAH5DNl5B//W/5xdbjBslXC8n74=");
+        log.debug(cardDataDto.toString());
+
+    }
+
+    @Test
+    @DisplayName("카드데이터 마스킹 테스트")
+    void getCardDataMaskingTest() throws Exception {
+
+        CardDataVo cardDataVo = PayDataUtil.getMaskingCardDataObjFromEnc("JqBXBn0nMHHD62JQBeIzYtCafBxy1iwpggaLR5g/HSI=");
         log.debug(cardDataVo.toString());
 
     }
+
+    @Test
+    @DisplayName("카드데이터 마스킹 테스트2")
+    void getCardDataObjMaskingTest() throws Exception {
+        CardDataDto cardDataDto = CardDataDto.builder()
+                .cardNum("15126134125")
+                .validPeriod("0922")
+                .cvc("888")
+                .build();
+
+        CardDataVo cardDataVo = PayDataUtil.getMaskingCardDataObj(cardDataDto);
+        log.debug(cardDataVo.toString());
+
+    }
+
+
 }

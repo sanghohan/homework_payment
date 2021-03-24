@@ -1,6 +1,6 @@
 package com.kakopay.homework.payment.dto;
 
-import com.kakopay.homework.payment.controller.vo.PayReqVo;
+import com.kakopay.homework.payment.controller.vo.req.PayReqVo;
 import com.kakopay.homework.payment.util.PayDataUtil;
 import lombok.*;
 
@@ -22,7 +22,7 @@ public class PayDto {
                 .payAmount(payReqVo.getPayAmount())
                 .payVat(payReqVo.getVat())
                 .installmentMonths(payReqVo.getInstallmentMonths())
-                .cardData(PayDataUtil.getCardData(payReqVo.getCardNum(), payReqVo.getValidPeriod(), payReqVo.getCvc()))
+                .cardData(PayDataUtil.getCardStringData(payReqVo.getCardNum(), payReqVo.getValidPeriod(), payReqVo.getCvc()))
                 .build();
     }
 

@@ -1,4 +1,4 @@
-package com.kakopay.homework.payment.Exception;
+package com.kakopay.homework.payment.runtime.Exception;
 
 import lombok.Getter;
 import lombok.Setter;

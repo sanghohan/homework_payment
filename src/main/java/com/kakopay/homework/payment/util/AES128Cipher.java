@@ -1,6 +1,5 @@
 package com.kakopay.homework.payment.util;
 
-import com.kakopay.homework.payment.Exception.PayException;
 import org.apache.tomcat.util.codec.binary.Base64;
 
 import javax.crypto.Cipher;
@@ -15,7 +14,7 @@ public class AES128Cipher {
     final static String IV = secretKey.substring(0, 16);
 
     //암호화
-    public static String AES_Encode(String str) throws Exception {
+    public static String AES_Encode(String str) throws RuntimeException {
         try {
             byte[] keyData = secretKey.getBytes(StandardCharsets.UTF_8);
             SecretKey secureKey = new SecretKeySpec(keyData, "AES");
@@ -26,13 +25,13 @@ public class AES128Cipher {
             return new String(Base64.encodeBase64(encrypted));
 
         } catch (Exception e) {
-            throw new PayException("PAY_8000");
+            throw new RuntimeException("PAY_8000");
         }
 
     }
 
     //복호화
-    public static String AES_Decode(String str) throws Exception {
+    public static String AES_Decode(String str) throws RuntimeException {
         try {
             byte[] keyData = secretKey.getBytes();
             SecretKey secureKey = new SecretKeySpec(keyData, "AES");
@@ -44,7 +43,7 @@ public class AES128Cipher {
             return new String(c.doFinal(byteStr), StandardCharsets.UTF_8);
 
         } catch (Exception e) {
-            throw new PayException("PAY_8000");
+            throw new RuntimeException("PAY_8000");
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.kakopay.homework.payment.controller.vo;
+package com.kakopay.homework.payment.runtime.model;
 
 import lombok.AccessLevel;
 import lombok.Builder;

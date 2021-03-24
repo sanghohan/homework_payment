@@ -1,5 +1,6 @@
 package com.kakopay.homework.payment.external.linkdata.stringdata;
 
+import com.kakopay.homework.payment.util.PayDataUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +29,7 @@ public class StringDataGenerator {
             if (ObjectUtils.isEmpty(fixedLengthField))
                 continue;
 
-            field = setAccessible(field);
+            field = PayDataUtil.setAccessible(field);
             String fixedLengthFieldString = fixedLengthFieldsToString(obj, field, fixedLengthField);
 
             log.debug("fixed length Field String, field name {}, align {} : {}",
@@ -65,12 +66,10 @@ public class StringDataGenerator {
             Object value = field.get(obj);
             FieldSet fieldSet = fixedLengthField.fieldSet();
 
-            switch (fieldSet.getAlignment()) {
-                case LEFT:
-                    return StringUtils.rightPad(String.valueOf(value), fixedLengthField.length(), fieldSet.getPadChar());
-                default:
-                    return StringUtils.leftPad(String.valueOf(value), fixedLengthField.length(), fieldSet.getPadChar());
-            }
+            if(fieldSet.getAlignment().equals(FieldAlignment.LEFT))
+                return StringUtils.rightPad(String.valueOf(value), fixedLengthField.length(), fieldSet.getPadChar());
+            else
+                return StringUtils.leftPad(String.valueOf(value), fixedLengthField.length(), fieldSet.getPadChar());
 
         } catch (IllegalAccessException e) {
             log.error(e.getMessage());
@@ -78,12 +77,5 @@ public class StringDataGenerator {
         }
     }
 
-    private static Field setAccessible(Field field) {
-        if (!field.isAccessible()) {
-            field.setAccessible(true);
-        }
-
-        return field;
-    }
 
 }

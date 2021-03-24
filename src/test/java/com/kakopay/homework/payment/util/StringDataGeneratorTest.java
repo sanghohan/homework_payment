@@ -3,6 +3,7 @@ package com.kakopay.homework.payment.util;
 import com.kakopay.homework.payment.entity.Payment;
 import com.kakopay.homework.payment.external.linkdata.stringdata.Body;
 import com.kakopay.homework.payment.external.linkdata.stringdata.Header;
+import com.kakopay.homework.payment.runtime.Exception.PayException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +46,7 @@ public class StringDataGeneratorTest {
 
     @Test
     @DisplayName("string data body 생성 테스트")
-    void bodyTest() {
+    void bodyTest() throws PayException {
         String result = body.getStringData();
         log.debug(result);
         log.debug("length : {}", result.length());

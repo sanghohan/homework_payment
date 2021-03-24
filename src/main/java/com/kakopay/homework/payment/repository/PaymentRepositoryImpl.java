@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import java.util.List;
 
 @Repository
 public class PaymentRepositoryImpl extends QuerydslRepositorySupport implements PaymentRepository {
@@ -39,8 +38,10 @@ public class PaymentRepositoryImpl extends QuerydslRepositorySupport implements 
     }
 
     @Override
-    public List<Payment> findPaymentsByTxId(String txId) {
-        return null;
+    public Payment findPaymentsByTxId(String txId) {
+        return queryFactory.selectFrom($)
+                .where(QPayment.payment.txId.eq(txId))
+                .fetchOne();
     }
 
     @Override

@@ -1,9 +1,9 @@
 package com.kakopay.homework.payment.entity;
 
-import com.kakopay.homework.payment.Exception.PayException;
-import com.kakopay.homework.payment.controller.vo.CardDataVo;
 import com.kakopay.homework.payment.dto.CancelDto;
+import com.kakopay.homework.payment.dto.CardDataDto;
 import com.kakopay.homework.payment.dto.PayDto;
+import com.kakopay.homework.payment.runtime.Exception.PayException;
 import com.kakopay.homework.payment.util.PayDataUtil;
 import lombok.*;
 import org.apache.commons.lang3.ObjectUtils;
@@ -68,7 +68,7 @@ public class Payment {
 
     public enum PayStatus {
         PAID,
-        CANCELD,
+        CANCELED,
         PARTIALLY_CANCELLED
     }
 
@@ -128,7 +128,7 @@ public class Payment {
                 .payAmount(reqDto.getPayAmount())
                 .payVat(reqDto.getPayVat())
                 .installmentMonths(reqDto.getInstallmentMonths())
-                .cardData(PayDataUtil.getEncCardData(reqDto.getCardData()))
+                .cardData(PayDataUtil.getEncCardStringData(reqDto.getCardData()))
                 .linkedData(linkedData)
                 .payBuild();
     }
@@ -139,7 +139,7 @@ public class Payment {
                 .txId(cancelDto.getTxId())
                 .cancelAmount(cancelDto.getCancelAmount())
                 .cancelVat(cancelDto.getCalculatedVat())
-                .cardData(PayDataUtil.getEncCardData(cardData))
+                .cardData(PayDataUtil.getEncCardStringData(cardData))
                 .linkedData(linkedData)
                 .orgPayTxId(orgPayTxId)
                 .cancelBuild();
@@ -152,7 +152,7 @@ public class Payment {
         cancelVat += cancelDto.getCalculatedVat();
 
         if (cancelAmount.equals(payAmount)) {
-            status = PayStatus.CANCELD;
+            status = PayStatus.CANCELED;
         } else {
             status = PayStatus.PARTIALLY_CANCELLED;
         }
@@ -193,8 +193,8 @@ public class Payment {
         return this.payVat - this.cancelVat;
     }
 
-    public CardDataVo getCardData() throws Exception {
+    public CardDataDto getCardData() throws Exception {
 
-        return PayDataUtil.getDecCardData(cardData);
+        return PayDataUtil.getDecCardStringData(cardData);
     }
 }

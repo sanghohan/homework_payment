@@ -1,11 +1,13 @@
 package com.kakopay.homework.payment.controller;
 
-import com.kakopay.homework.payment.controller.vo.CancelReqVo;
-import com.kakopay.homework.payment.controller.vo.PayReqVo;
-import com.kakopay.homework.payment.controller.vo.StringData;
+import com.kakopay.homework.payment.controller.vo.req.CancelReqVo;
+import com.kakopay.homework.payment.controller.vo.req.PayReqVo;
+import com.kakopay.homework.payment.controller.vo.res.PayInfoResVo;
+import com.kakopay.homework.payment.controller.vo.res.StringData;
 import org.junit.jupiter.api.*;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -13,6 +15,7 @@ public class payControllerTest extends BaseTest {
 
     private static final String PAY_URL = "/payments/v1/pay";
     private static final String CANCEL_URL = "/payments/v1/cancel";
+    private static final String GET_PAY_URL = "/payments/v1/{txId}";
 
     private static PayReqVo payReqVo1;
     private static PayReqVo payReqVo2;
@@ -63,6 +66,38 @@ public class payControllerTest extends BaseTest {
     }
 
     @Nested
+    class Find {
+        @Test
+        @DisplayName("조회 테스트")
+        void getTest() throws Exception {
+
+
+            StringData payResponse = objectMapper.readValue(payResultActions1.andReturn().getResponse().getContentAsString(),
+                    StringData.class);
+
+            String getUrl = GET_PAY_URL.replace("{txId}", payResponse.getTxId());
+
+            ResultActions resultActions = assertGetResult(getUrl, status().isOk());
+
+            PayInfoResVo resVo = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsString(),
+                    PayInfoResVo.class);
+
+
+            assertThat(resVo).isNotNull();
+            assertThat(resVo.getCardDataVo().getCardNum()).isEqualTo("151361***432");
+            assertThat(resVo.getCardDataVo().getValidPeriod()).isEqualTo(payReqVo1.getValidPeriod());
+            assertThat(resVo.getCardDataVo().getCvc()).isEqualTo(payReqVo1.getCvc());
+            assertThat(resVo.getPayType().toString()).isEqualTo("PAY");
+            assertThat(resVo.getStatus().toString()).isEqualTo("PAID");
+            assertThat(resVo.getPayAmountInfo().getTransactionAmount()).isEqualTo(payReqVo1.getPayAmount());
+            assertThat(resVo.getPayAmountInfo().getVat()).isEqualTo(payReqVo1.getVat());
+
+            //System.out.println(resVo.toString());
+
+        }
+    }
+
+    @Nested
     class Cancel {
         @Test
         @DisplayName("전체 취소 테스트")
@@ -78,7 +113,7 @@ public class payControllerTest extends BaseTest {
                     .build();
 
             assertPostResult(CANCEL_URL, cancelReqVo, status().isOk());
-            //TODO:취소결제 조회 테스트 추가 해야함
+
 
         }
 
@@ -111,9 +146,6 @@ public class payControllerTest extends BaseTest {
 
             ResultActions resultActions1 = assertPostResult(CANCEL_URL, cancelReqVo, status().isBadRequest());
             resultActions1.andExpect(jsonPath("code").value("PAY_3003"));
-
-
-
 
             cancelReqVo = CancelReqVo.builder()
                     .txId(payResponse.getTxId())

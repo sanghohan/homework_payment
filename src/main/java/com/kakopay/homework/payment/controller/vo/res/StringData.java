@@ -1,9 +1,10 @@
-package com.kakopay.homework.payment.controller.vo;
+package com.kakopay.homework.payment.controller.vo.res;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kakopay.homework.payment.external.linkdata.stringdata.Body;
 import com.kakopay.homework.payment.external.linkdata.stringdata.Header;
+import com.kakopay.homework.payment.runtime.Exception.PayException;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

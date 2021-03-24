@@ -1,6 +1,6 @@
 package com.kakopay.homework.payment.dto;
 
-import com.kakopay.homework.payment.controller.vo.CancelReqVo;
+import com.kakopay.homework.payment.controller.vo.req.CancelReqVo;
 import com.kakopay.homework.payment.util.PayDataUtil;
 import lombok.Builder;
 import lombok.Getter;

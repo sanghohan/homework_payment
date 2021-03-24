@@ -1,14 +1,21 @@
-package com.kakopay.homework.payment.config;
+package com.kakopay.homework.payment.runtime.config;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Collections;
 
 @Configuration
-public class FilterConfig {
+public class Configurations {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Bean
     public FilterRegistrationBean characterEncodingFilter() {
@@ -20,5 +27,15 @@ public class FilterConfig {
         filterRegistrationBean.setFilter(characterEncodingFilter);
 
         return filterRegistrationBean;
+    }
+
+    @Bean
+    public JPAQueryFactory jpaQueryFactory() {
+        return new JPAQueryFactory(entityManager);
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
     }
 }
