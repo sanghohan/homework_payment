@@ -46,12 +46,12 @@ public class PayDataUtil {
 
     }
 
-    public static String getEncCardStringData(String combinedCardData) throws Exception {
+    public static String getEncCardStringData(String combinedCardData) {
 
         return AES128Cipher.AES_Encode(combinedCardData);
     }
 
-    public static String getEncCardStringData(String cardNum, String validPeriod, String cvc) throws Exception {
+    public static String getEncCardStringData(String cardNum, String validPeriod, String cvc) {
 
         String combinedCardData = getCardStringData(cardNum, validPeriod, cvc);
         return AES128Cipher.AES_Encode(combinedCardData);
@@ -100,17 +100,14 @@ public class PayDataUtil {
     public static CardDataVo getMaskingCardDataObjFromEnc(String encCardStringData) throws Exception {
 
         CardDataDto cardDataDto = getDecCardStringData(encCardStringData);
-        CardDataVo cardDataVo = modelMapper.map(cardDataDto, CardDataVo.class);
 
-        return (CardDataVo) maskingString(cardDataVo);
+        return (CardDataVo) maskingString(modelMapper.map(cardDataDto, CardDataVo.class));
 
     }
 
     public static CardDataVo getMaskingCardDataObj(CardDataDto cardDataDto) throws Exception {
 
-        CardDataVo cardDataVo = modelMapper.map(cardDataDto, CardDataVo.class);
-
-        return (CardDataVo) maskingString(cardDataVo);
+        return (CardDataVo) maskingString(modelMapper.map(cardDataDto, CardDataVo.class));
 
     }
 

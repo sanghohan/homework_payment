@@ -3,11 +3,12 @@ package com.kakopay.homework.payment.util;
 import com.kakopay.homework.payment.entity.Payment;
 import com.kakopay.homework.payment.external.linkdata.stringdata.Body;
 import com.kakopay.homework.payment.external.linkdata.stringdata.Header;
-import com.kakopay.homework.payment.runtime.Exception.PayException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 public class StringDataGeneratorTest {
@@ -32,7 +33,6 @@ public class StringDataGeneratorTest {
                 .vat(0)
                 .build();
 
-
     }
 
     @Test
@@ -42,14 +42,18 @@ public class StringDataGeneratorTest {
         log.debug(result);
         log.debug("length : {}", result.length());
 
+        assertThat(result.length()).isEqualTo(34);
+
     }
 
     @Test
     @DisplayName("string data body 생성 테스트")
-    void bodyTest() throws PayException {
+    void bodyTest() {
         String result = body.getStringData();
         log.debug(result);
         log.debug("length : {}", result.length());
+
+        assertThat(result.length()).isEqualTo(416);
 
     }
 }

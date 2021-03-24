@@ -75,7 +75,7 @@ public class PaymentService {
         Payment payment = paymentRepository.findPaymentsByTxId(txId);
 
         if (ObjectUtils.isEmpty(payment))
-            throw new PayException("PAY_3001", txId);
+            throw new PayException("PAY_3006", txId);
 
         PayAmountInfo payAmountInfo = PayAmountInfo.builder()
                 .payment(payment)

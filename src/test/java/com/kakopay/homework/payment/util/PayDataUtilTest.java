@@ -3,14 +3,14 @@ package com.kakopay.homework.payment.util;
 import com.kakopay.homework.payment.controller.vo.res.CardDataVo;
 import com.kakopay.homework.payment.dto.CardDataDto;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
 
 @Slf4j
 class PayDataUtilTest {
@@ -26,7 +26,7 @@ class PayDataUtilTest {
             assertThat(txId.length()).isEqualTo(20);
 
             if(i>0 && checkList.contains(txId))
-                Assertions.fail();
+                Assertions.fail("duplicated txId");
 
             checkList.add(txId);
             log.debug("line number {} : {}", i+1, txId);
@@ -38,7 +38,8 @@ class PayDataUtilTest {
     void getCardDataTest() {
 
         String cardData = PayDataUtil.getCardStringData("cardNum", "validPeriod", "cvc");
-        assertThat(cardData.equals("cardNum|validPeriod|cvc"));
+        log.debug(cardData);
+        assertThat(cardData).isEqualTo("cardNum|validPeriod|cvc");
     }
 
     @Test
@@ -47,6 +48,8 @@ class PayDataUtilTest {
 
         String cardData = PayDataUtil.getEncCardStringData("15126134125", "0922", "888");
         log.debug(cardData);
+        assertThat(cardData).isEqualTo("JqBXBn0nMHHD62JQBeIzYtCafBxy1iwpggaLR5g/HSI=");
+
 
     }
 
@@ -57,6 +60,10 @@ class PayDataUtilTest {
         CardDataDto cardDataDto = PayDataUtil.getDecCardStringData("Vr9ggh4LBWd7q99zUAH5DNl5B//W/5xdbjBslXC8n74=");
         log.debug(cardDataDto.toString());
 
+        assertThat(cardDataDto.getCardNum()).isEqualTo("cardNum");
+        assertThat(cardDataDto.getValidPeriod()).isEqualTo("validPeriod");
+        assertThat(cardDataDto.getCvc()).isEqualTo("cvc");
+
     }
 
     @Test
@@ -64,7 +71,8 @@ class PayDataUtilTest {
     void getCardDataMaskingTest() throws Exception {
 
         CardDataVo cardDataVo = PayDataUtil.getMaskingCardDataObjFromEnc("JqBXBn0nMHHD62JQBeIzYtCafBxy1iwpggaLR5g/HSI=");
-        log.debug(cardDataVo.toString());
+        assertThat(cardDataVo.getCardNum()).isEqualTo("151261**125");
+
 
     }
 
@@ -72,13 +80,15 @@ class PayDataUtilTest {
     @DisplayName("카드데이터 마스킹 테스트2")
     void getCardDataObjMaskingTest() throws Exception {
         CardDataDto cardDataDto = CardDataDto.builder()
-                .cardNum("15126134125")
+                .cardNum("15126234126")
                 .validPeriod("0922")
                 .cvc("888")
                 .build();
 
         CardDataVo cardDataVo = PayDataUtil.getMaskingCardDataObj(cardDataDto);
         log.debug(cardDataVo.toString());
+
+        assertThat(cardDataVo.getCardNum()).isEqualTo("151262**126");
 
     }
 
