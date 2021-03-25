@@ -20,6 +20,12 @@
 2. mvn clean package -DskipTests 실행 후 target 경로에서
    java -jar homework_payment-0.0.1-SNAPSHOT.jar 실행
 
+### DB 접속
+* Application 실행 후, http://localhost:8080/h2-console/ 접속
+* Driver Class: org.h2.Driver
+* JDBC URL: jdbc:h2:mem:payment
+* User Name: sa
+* Password : N/A (없음)
 
 ### API
 * 결제 : (POST) http://localhost:8080/payments/v1/pay
