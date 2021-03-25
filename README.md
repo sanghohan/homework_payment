@@ -22,7 +22,7 @@
 
 
 ### API
-* 결제 : http://localhost:8080/payments/v1/pay
+* 결제 : (POST) http://localhost:8080/payments/v1/pay
 <br><br>
   request sample <br><br>
   {
@@ -40,7 +40,7 @@
   "stringData": " 416PAY       1616637066989RrUDsY0151361324432        000522123     200000000000909                    sy32TwjsePD6fRa715qyoC/wALTg1sBfo8xNikLSf4A=                                                                                                                                                                                                                                                                                                               "
   }
   <br><br>
-* 취소 : http://localhost:8080/payments/v1/cancel
+* 취소 : (POST) http://localhost:8080/payments/v1/cancel
 <br><br>
   request sample <br><br>
   {
@@ -54,7 +54,7 @@
   "stringData": " 416CANCEL    1616637189729ux1zaGt151361324432        000522123     100000000000000                    sy32TwjsePD6fRa715qyoC/wALTg1sBfo8xNikLSf4A=                                                                                                                                                                                                                                                                                                               "
   }<br><br>
   
-* 조회 : http://localhost:8080/payments/v1/1616568935187uVnHUh7
+* 조회 : (GET) http://localhost:8080/payments/v1/1616568935187uVnHUh7
   <br><br>
   result sample <br><br>
 {
