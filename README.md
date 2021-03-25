@@ -9,7 +9,7 @@
 ![db_schema](https://user-images.githubusercontent.com/8196614/112402875-adefb500-8d50-11eb-9377-9dc87fedc899.png)
 
 ### 문제 해결 전략
-* 기본 결제 취소 로직 : 결제 테이블 한 ROW에 취소 합계 금액 저장, 취소 ROW에 원결제 txId 저장
+* 기본 결제 취소 로직 : 결제 테이블 한 ROW에 취소 합계, VAT 금액 저장, 취소 ROW에 원결제 txId 저장
 * 20자리 unique key : System.currentTimeMillis() + RandomString 7자리
 * Masking : 제외 하는 영역이 아닌 Masking은 해야하는 영역을 인자값으로 받도록 함, Custom Annotation을 사용
 * 카드사 연동 String Data : Custom Annotation을 사용
