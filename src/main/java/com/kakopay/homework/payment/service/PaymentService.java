@@ -35,7 +35,7 @@ public class PaymentService {
     private static Queue<String> PAYING_CARD_DATA = new ConcurrentLinkedQueue<>();
     private static Queue<String> CANCELING_TXID_DATA = new ConcurrentLinkedQueue<>();
 
-    @Transactional
+    @Transactional(rollbackFor = PayException.class)
     public StringData pay(PayDto reqDto) throws Exception {
 
         try {
@@ -49,7 +49,7 @@ public class PaymentService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = PayException.class)
     public StringData cancel(CancelDto reqDto) throws Exception {
 
         try {

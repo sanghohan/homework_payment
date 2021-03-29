@@ -121,7 +121,7 @@ public class Payment {
         this.updDt = LocalDateTime.now();
     }
 
-    public static Payment getPay(PayDto reqDto, String linkedData) throws Exception {
+    public static Payment getPay(PayDto reqDto, String linkedData) {
 
         return Payment.payBuilder()
                 .txId(reqDto.getTxId())
@@ -133,7 +133,7 @@ public class Payment {
                 .payBuild();
     }
 
-    public static Payment getCancel(CancelDto cancelDto, String cardData, String linkedData, String orgPayTxId) throws Exception {
+    public static Payment getCancel(CancelDto cancelDto, String cardData, String linkedData, String orgPayTxId) {
 
         return Payment.cancelBuilder()
                 .txId(cancelDto.getTxId())
