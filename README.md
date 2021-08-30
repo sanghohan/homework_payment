@@ -1,4 +1,4 @@
-### 서버사전과제1_결제시스템
+### 심플 결제시스템  
 ### 개발 프레임워크
 * openjdk1.8
 * Spring Boot JPA 2.43
@@ -80,6 +80,6 @@
 "transactionDt": "2021-03-25T10:53:09.74"
 }
   
-### 과제 테스트 케이스 
+### 테스트 케이스 
 * payControllerTest.java
   
