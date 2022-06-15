@@ -53,6 +53,11 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+      with:
+        java-version: '17'
+        distribution: 'zulu'
+          - name: Build with Maven
+            run: mvn clean package
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1

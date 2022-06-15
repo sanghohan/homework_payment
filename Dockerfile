@@ -2,8 +2,8 @@ FROM azul/zulu-openjdk-alpine:17
 
 CMD ["./mvn", "clean", "package"]
 
-COPY target/*.jar app.jar
+WORKDIR target
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "homework_payment.jar"]
