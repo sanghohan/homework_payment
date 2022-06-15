@@ -61,7 +61,7 @@ jobs:
         distribution: 'zulu'
 
     - name: Build java
-      run: mvn clean package
+      run: mvn clean package -Dmaven.test.skip=true
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
