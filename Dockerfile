@@ -1,6 +1,6 @@
 FROM azul/zulu-openjdk-alpine:17
 
-CMD ["./mvnw", "clean", "package"]
+CMD ["./mvn", "clean", "package"]
 
 COPY target/*.jar app.jar
 
