@@ -59,7 +59,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'zulu'
-      - run: mvn clean package
+      run: mvn clean package
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
