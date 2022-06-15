@@ -2,7 +2,7 @@ FROM azul/zulu-openjdk-alpine:17
 
 CMD ["./mvnw", "clean", "package"]
 
-COPY ./target/*.jar app.jar
+COPY target/*.jar app.jar
 
 EXPOSE 8080
 
