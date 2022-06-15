@@ -59,6 +59,8 @@ jobs:
       with:
         java-version: '17'
         distribution: 'zulu'
+
+    - name: Build java
       run: mvn clean package
 
     - name: Configure AWS credentials
